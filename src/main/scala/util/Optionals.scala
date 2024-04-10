@@ -19,6 +19,9 @@ object Optionals:
       case Just(a) => a
       case _ => orElse
 
+    def get(): A = opt match
+      case Just(a) => a
+
     def flatMap[B](f: A => Optional[B]): Optional[B] = opt match
       case Just(a) => f(a)
       case _ => Empty()
