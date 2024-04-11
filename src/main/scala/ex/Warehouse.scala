@@ -1,6 +1,6 @@
 package ex
 
-import ex.Warehouse.{SameTagV1, SameTagV2}
+import ex.Warehouse.{SameTagV1, SameTagV2, SameTagV3}
 import util.Optionals.Optional
 import util.Sequences.*
 
@@ -12,6 +12,7 @@ trait Item:
 
 object Item:
   def apply(code: Int, name: String, tags: String*): Item = ItemImpl(code,name,Sequence(tags*))
+  def empty: Item = ItemImpl(-1,"",Sequence(""))
   private case class ItemImpl(code: Int, name: String, tags: Sequence[String]) extends Item
 /**
  * A warehouse is a place where items are stored.
@@ -84,6 +85,14 @@ object Warehouse:
           case s: Sequence[String] => Option.apply(s)
         case Optional.Empty() => Option.empty
 
+  object SameTagV3:
+    def unapply(s: Sequence[Item]): Option[Sequence[String]] =
+      s.map(_.tags).foldLeft(s.head.orElse(Item.empty).tags)(
+          (acc, seq) => acc.intersect(seq)) match
+          case Sequence.Nil() => Option.empty
+          case s: Sequence[String] => Option.apply(s)
+
+
 
 @main def mainWarehouse(): Unit =
   val warehouse = Warehouse()
@@ -128,11 +137,11 @@ object Warehouse:
       case Sequence.Nil() => Sequence()
 
   warehouse.items match
-    case SameTagV2(t) => println(s"common tags: ${t}")
+    case SameTagV3(t) => println(s"common tags: ${t}")
     case _ => println("no tag in common")
 
   warehouse2.items match
-    case SameTagV2(t) => println(s"common tags: ${t}")
+    case SameTagV3(t) => println(s"common tags: ${t}")
     case _ => println("no tag in common")
 
   println(filterTags(warehouse.items.map(_.tags)))
