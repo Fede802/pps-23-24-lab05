@@ -1,6 +1,6 @@
 package ex
 
-import ex.Warehouse.{SameTagV1, SameTagV2, SameTagV3}
+import ex.Warehouse.SameTag
 import util.Optionals.Optional
 import util.Sequences.*
 
@@ -66,26 +66,7 @@ object Warehouse:
 
     def contains(itemCode: Int): Boolean = retrieve(itemCode).isEmpty
 
-  object SameTagV1:
-    @tailrec
-    def unapply(s: Sequence[Sequence[String]]): Option[Sequence[String]]=
-      s match
-        case Sequence.Cons(firstItemTagList, Sequence.Cons(secondItemTagList, itemTail)) =>
-          val intersection = firstItemTagList.intersect(secondItemTagList)
-          if intersection.isEmpty then Option.empty else unapply(Sequence(intersection).concat(itemTail))
-        case Sequence.Cons(firstItemTagList, Sequence.Nil()) => Option.apply(firstItemTagList)
-        case Sequence.Nil() => Option.empty
-
-  object SameTagV2:
-    def unapply(s: Sequence[Item]): Option[Sequence[String]] =
-      s.head match
-        case Optional.Just(a) => s.map(_.tags).foldLeft(a.tags)(
-          (acc, seq) => acc.intersect(seq)) match
-          case Sequence.Nil() => Option.empty
-          case s: Sequence[String] => Option.apply(s)
-        case Optional.Empty() => Option.empty
-
-  object SameTagV3:
+  object SameTag:
     def unapply(s: Sequence[Item]): Option[Sequence[String]] =
       s.map(_.tags).foldLeft(s.head.orElse(Item.empty).tags)(
           (acc, seq) => acc.intersect(seq)) match
@@ -127,24 +108,15 @@ object Warehouse:
   println:
     warehouse.retrieve(dellXps.code) // None
 
-  @tailrec
-  def filterTags(s: Sequence[Sequence[String]]): Sequence[String] =
-    s match
-      case Sequence.Cons(firstItemTagList, Sequence.Cons(secondItemTagList, itemTail)) =>
-          val intersection = firstItemTagList.intersect(secondItemTagList)
-          if intersection.isEmpty then Sequence() else filterTags(Sequence(intersection).concat(itemTail))
-      case Sequence.Cons(firstItemTagList, Sequence.Nil()) => firstItemTagList
-      case Sequence.Nil() => Sequence()
-
   warehouse.items match
-    case SameTagV3(t) => println(s"common tags: ${t}")
+    case SameTag(t) => println(s"common tags: ${t}")
     case _ => println("no tag in common")
 
   warehouse2.items match
-    case SameTagV3(t) => println(s"common tags: ${t}")
+    case SameTag(t) => println(s"common tags: ${t}")
     case _ => println("no tag in common")
 
-  println(filterTags(warehouse.items.map(_.tags)))
+
 
 
 
