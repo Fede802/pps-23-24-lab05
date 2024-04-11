@@ -1,6 +1,6 @@
 package ex
 
-import ex.Warehouse.SameTag
+import ex.Warehouse.{SameTagV1, SameTagV2}
 import util.Optionals.Optional
 import util.Sequences.*
 
@@ -12,7 +12,6 @@ trait Item:
 
 object Item:
   def apply(code: Int, name: String, tags: String*): Item = ItemImpl(code,name,Sequence(tags*))
-
   private case class ItemImpl(code: Int, name: String, tags: Sequence[String]) extends Item
 /**
  * A warehouse is a place where items are stored.
@@ -66,7 +65,7 @@ object Warehouse:
 
     def contains(itemCode: Int): Boolean = retrieve(itemCode).isEmpty
 
-  object SameTag:
+  object SameTagV1:
     @tailrec
     def unapply(s: Sequence[Sequence[String]]): Option[Sequence[String]]=
       s match
@@ -75,6 +74,16 @@ object Warehouse:
           if intersection.isEmpty then Option.empty else unapply(Sequence(intersection).concat(itemTail))
         case Sequence.Cons(firstItemTagList, Sequence.Nil()) => Option.apply(firstItemTagList)
         case Sequence.Nil() => Option.empty
+
+  object SameTagV2:
+    def unapply(s: Sequence[Item]): Option[Sequence[String]] =
+      s.head match
+        case Optional.Just(a) => s.map(_.tags).foldLeft(a.tags)(
+          (acc, seq) => acc.intersect(seq)) match
+          case Sequence.Nil() => Option.empty
+          case s: Sequence[String] => Option.apply(s)
+        case Optional.Empty() => Option.empty
+
 
 @main def mainWarehouse(): Unit =
   val warehouse = Warehouse()
@@ -118,12 +127,12 @@ object Warehouse:
       case Sequence.Cons(firstItemTagList, Sequence.Nil()) => firstItemTagList
       case Sequence.Nil() => Sequence()
 
-  warehouse.items.map(_.tags) match
-    case SameTag(t) => println(s"common tags: ${t}")
+  warehouse.items match
+    case SameTagV2(t) => println(s"common tags: ${t}")
     case _ => println("no tag in common")
 
-  warehouse2.items.map(_.tags) match
-    case SameTag(t) => println(s"common tags: ${t}")
+  warehouse2.items match
+    case SameTagV2(t) => println(s"common tags: ${t}")
     case _ => println("no tag in common")
 
   println(filterTags(warehouse.items.map(_.tags)))

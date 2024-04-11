@@ -69,6 +69,12 @@ object Sequences: // Essentially, generic linkedlists
       def reverse(): Sequence[A] = sequence match
         case Cons(h, t) => t.reverse().concat(Cons(h, Nil()))
         case _ => Nil()
+
+      @annotation.tailrec
+      def foldLeft(a: Sequence[String])(f: (Sequence[String], A) => Sequence[String]): Sequence[String] = sequence match
+        case Cons(h, t) => t.foldLeft(f(a, h))(f)
+        case Nil() => a
+
 @main def trySequences =
   import Sequences.* 
   val sequence = Sequence(1, 2, 3)
