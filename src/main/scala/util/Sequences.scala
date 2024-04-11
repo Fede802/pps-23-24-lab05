@@ -2,6 +2,8 @@ package util
 import Optionals.Optional.*
 import util.Optionals.Optional
 
+import scala.annotation.tailrec
+
 object Sequences: // Essentially, generic linkedlists
   
   enum Sequence[E]:
@@ -21,11 +23,19 @@ object Sequences: // Essentially, generic linkedlists
 
 
     def empty[A]: Sequence[A] = Nil()
-
+    def count[A](s: Sequence[A]): Int =
+      @tailrec
+      def _count(s: Sequence[A], i: Int): Int = s match
+        case Cons(_,t) => _count(t,i+1)
+        case _ => i
+      _count(s,0)
     extension [A](sequence: Sequence[A])
       def head: Optional[A] = sequence match
         case Cons(h, _) => Just(h)
         case _ => Empty()
+      def foreach(action : A => Unit): Unit = sequence match
+        case Cons(h,t) => {action(h); t.foreach(action)}
+        case _ => ()
 
       def concat(other: Sequence[A]): Sequence[A] = sequence match
         case Cons(h, t) => Cons(h, t.concat(other))

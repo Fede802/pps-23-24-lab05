@@ -82,11 +82,11 @@ public class GUI extends JFrame {
             // disable the button
 
 
-//            if(this.logics.getCellStatus(entry.getValue()).isMine()){
-//                entry.getKey().setFont(largerFont);
-//                entry.getKey().setText("*");
-//                entry.getKey().setEnabled(false);
-//            }
+            if(this.logics.getCellStatus(entry.getValue()).mine()){
+                entry.getKey().setFont(largerFont);
+                entry.getKey().setText("*");
+                entry.getKey().setEnabled(false);
+            }
     	}
     }
 
@@ -96,12 +96,15 @@ public class GUI extends JFrame {
             // if this button is a cell with counter, put the number
             // if this button has a flag, put the flag
             GameCellData gameCellData = this.logics.getCellStatus(entry.getValue());
-//            if(gameCellData.isClicked() && !gameCellData.isMine()){
-//                entry.getKey().setText(String.valueOf(gameCellData.numberOfMinesAround()));
-//                entry.getKey().setEnabled(false);
-//            }else if(gameCellData.isFlagged()){
-//                entry.getKey().setText("F");
-//            }
+            if(gameCellData.clicked() && !gameCellData.mine()){
+                entry.getKey().setText(String.valueOf(gameCellData.minesAround()));
+                entry.getKey().setEnabled(false);
+            }
+            else if(gameCellData.flagged()){
+                entry.getKey().setText("F");
+            }else{
+                entry.getKey().setText("");
+            }
     	}
     }
     
