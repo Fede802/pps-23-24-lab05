@@ -1,7 +1,10 @@
 package ex
 
+import ex.Warehouse.SameTag
 import util.Optionals.Optional
 import util.Sequences.*
+
+import scala.annotation.tailrec
 trait Item:
   def code: Int
   def name: String
@@ -43,32 +46,46 @@ trait Warehouse:
    * @return true if the warehouse contains an item with the given code, false otherwise
    */
   def contains(itemCode: Int): Boolean
+  def items: Sequence[Item]
 end Warehouse
 
 object Warehouse:
+
   def apply(): Warehouse = WarehouseImpl()
 
-private case class WarehouseImpl() extends Warehouse:
-  private var items: Sequence[Item] = Sequence()
+  private case class WarehouseImpl() extends Warehouse:
+    var items: Sequence[Item] = Sequence()
 
-  def store(item: Item): Unit = items = items.concat(Sequence(item))
+    def store(item: Item): Unit = items = items.concat(Sequence(item))
 
-  def searchItems(tag: String): Sequence[Item] = items.filter(_.tags.contains(tag))
+    def searchItems(tag: String): Sequence[Item] = items.filter(_.tags.contains(tag))
 
-  def retrieve(code: Int): Optional[Item] = items.find(_.code == code)
+    def retrieve(code: Int): Optional[Item] = items.find(_.code == code)
 
-  def remove(item: Item): Unit = items.filter(_ != item)
+    def remove(item: Item): Unit = items.filter(_ != item)
 
-  def contains(itemCode: Int): Boolean = retrieve(itemCode).isEmpty
+    def contains(itemCode: Int): Boolean = retrieve(itemCode).isEmpty
 
+  object SameTag:
+    @tailrec
+    def unapply(s: Sequence[Sequence[String]]): Option[Sequence[String]]=
+      s match
+        case Sequence.Cons(firstItemTagList, Sequence.Cons(secondItemTagList, itemTail)) =>
+          val intersection = firstItemTagList.intersect(secondItemTagList)
+          if intersection.isEmpty then Option.empty else unapply(Sequence(intersection).concat(itemTail))
+        case Sequence.Cons(firstItemTagList, Sequence.Nil()) => Option.apply(firstItemTagList)
+        case Sequence.Nil() => Option.empty
 
 @main def mainWarehouse(): Unit =
   val warehouse = Warehouse()
-
+  val warehouse2 = Warehouse()
   val dellXps = Item(33, "Dell XPS 15","notebook")
   val dellInspiron = Item(34, "Dell Inspiron 13", "notebook")
-  val xiaomiMoped = Item(35, "Xiaomi S1", "moped", "mobility")
-
+  val xiaomiMoped = Item(35, "Xiaomi S1", "moped", "notebook","mobility")
+  val xiaomiMoped2 = Item(35, "Xiaomi S1", "moped","mobility")
+  warehouse2.store(dellXps)
+  warehouse2.store(dellInspiron)
+  warehouse2.store(xiaomiMoped2)
   println:
     warehouse.contains(dellXps.code) // false
   println:
@@ -91,6 +108,27 @@ private case class WarehouseImpl() extends Warehouse:
     warehouse.remove(dellXps) // side effect, remove dell xps from the warehouse
   println:
     warehouse.retrieve(dellXps.code) // None
+
+  @tailrec
+  def filterTags(s: Sequence[Sequence[String]]): Sequence[String] =
+    s match
+      case Sequence.Cons(firstItemTagList, Sequence.Cons(secondItemTagList, itemTail)) =>
+          val intersection = firstItemTagList.intersect(secondItemTagList)
+          if intersection.isEmpty then Sequence() else filterTags(Sequence(intersection).concat(itemTail))
+      case Sequence.Cons(firstItemTagList, Sequence.Nil()) => firstItemTagList
+      case Sequence.Nil() => Sequence()
+
+  warehouse.items.map(_.tags) match
+    case SameTag(t) => println(s"common tags: ${t}")
+    case _ => println("no tag in common")
+
+  warehouse2.items.map(_.tags) match
+    case SameTag(t) => println(s"common tags: ${t}")
+    case _ => println("no tag in common")
+
+  println(filterTags(warehouse.items.map(_.tags)))
+
+
 
 /** Hints:
  * - Implement the Item with a simple case class

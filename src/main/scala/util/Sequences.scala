@@ -21,18 +21,26 @@ object Sequences: // Essentially, generic linkedlists
         sequence = Cons(e, sequence)
       sequence.reverse()
 
-
     def empty[A]: Sequence[A] = Nil()
+
     def count[A](s: Sequence[A]): Int =
       @tailrec
       def _count(s: Sequence[A], i: Int): Int = s match
         case Cons(_,t) => _count(t,i+1)
         case _ => i
       _count(s,0)
+
     extension [A](sequence: Sequence[A])
+      def isEmpty: Boolean = sequence match
+        case Sequence.Nil() => true
+        case _ => false
+      def intersect(sequence2: Sequence[A]): Sequence[A]=
+        sequence.filter(i => sequence2.contains(i))
+
       def head: Optional[A] = sequence match
         case Cons(h, _) => Just(h)
         case _ => Empty()
+
       def foreach(action : A => Unit): Unit = sequence match
         case Cons(h,t) => {action(h); t.foreach(action)}
         case _ => ()
@@ -72,5 +80,6 @@ object Sequences: // Essentially, generic linkedlists
   println(sequence.concat(Sequence(4, 5, 6)))
   println(sequence.find(_ % 2 == 0))
   println(sequence.contains(2))
+
 
 
