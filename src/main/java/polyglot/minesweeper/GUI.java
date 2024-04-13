@@ -8,17 +8,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
-import polyglot.Pair;
 
 
 public class GUI extends JFrame {
     
     private static final long serialVersionUID = -6218820567019985015L;
-    private final Map<JButton, Pair<Integer,Integer>> buttons = new HashMap<>();
+    private final Map<JButton, Position> buttons = new HashMap<>();
     private final Logics logics;
 
     public GUI(int size, int minesToPlace) {
-        boolean a = polyglot.minesweeper.ClickResult.WIN == polyglot.minesweeper.ClickResult.WIN;
         this.logics = new LogicsImpl(size,minesToPlace);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(100*size, 100*size);
@@ -28,7 +26,7 @@ public class GUI extends JFrame {
 
         ActionListener onClick = (e)->{
             final JButton bt = (JButton)e.getSource();
-            final Pair<Integer,Integer> pos = buttons.get(bt);
+            final Position pos = buttons.get(bt);
             ClickResult clickResult = this.logics.clickCell(pos);
             boolean aMineWasFound = clickResult == ClickResult.LOSE;// call the logic here to tell it that cell at 'pos' has been seleced
             if (aMineWasFound) {
@@ -51,7 +49,7 @@ public class GUI extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 final JButton bt = (JButton)e.getSource();
                 if (e.getButton() == MouseEvent.BUTTON3 && bt.isEnabled()){
-                    final Pair<Integer,Integer> pos = buttons.get(bt);
+                    final Position pos = buttons.get(bt);
                     // call the logic here to put/remove a flag
                     logics.toggleFlag(pos);
                 }
@@ -64,7 +62,7 @@ public class GUI extends JFrame {
                 final JButton jb = new JButton(" ");
                 jb.addActionListener(onClick);
                 jb.addMouseListener(onRightClick);
-                this.buttons.put(jb,new Pair<>(i,j));
+                this.buttons.put(jb,new Position(i,j));
                 panel.add(jb);
             }
         }
