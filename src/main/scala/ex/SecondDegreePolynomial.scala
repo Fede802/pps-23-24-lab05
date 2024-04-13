@@ -18,6 +18,7 @@ object SecondDegreePolynomial:
   private case class SecondDegreePolynomialImpl(secondDegree: Double, firstDegree: Double, constant: Double) extends SecondDegreePolynomial:
     def +(polynomial: SecondDegreePolynomial): SecondDegreePolynomial =
       SecondDegreePolynomial(secondDegree+polynomial.secondDegree, firstDegree+polynomial.firstDegree, constant+polynomial.constant)
+
     def -(polynomial: SecondDegreePolynomial): SecondDegreePolynomial =
       SecondDegreePolynomial(secondDegree-polynomial.secondDegree, firstDegree-polynomial.firstDegree, constant-polynomial.constant)
 
