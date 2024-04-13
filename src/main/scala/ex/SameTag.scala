@@ -1,13 +1,12 @@
 package ex
-
 import util.Sequences.Sequence
 
 object SameTag:
   def unapply(s: Sequence[Item]): Option[Sequence[String]] =
     s.map(_.tags).foldLeft(s.head.orElse(Item.empty).tags)(
       (acc, seq) => acc.intersect(seq)) match
-      case Sequence.Nil() => Option.empty
-      case s: Sequence[String] => Option.apply(s)
+      case Sequence.Nil() => None
+      case s: Sequence[String] => Some(s)
 
 @main def testSameTag(): Unit =
   val item1 = Item(0,"item1", "tag1", "tag2")
