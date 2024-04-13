@@ -29,7 +29,9 @@ class LogicsImpl(size: Int, mineToPlace: Int) extends Logics:
       case myOptional.Just(gc) =>
         grid = grid.map(gc => if gc.p == p then gc.select() else gc)
         if !gc.mine && gc.minesAround == 0 then neighbours(gc).foreach(gc => clickCell(gc.p))
-        if !grid.filter(gc => gc.mine && gc.selected).isEmpty then ClickResult.LOSE else if grid.filter(gc => !gc.mine && !gc.selected).isEmpty then ClickResult.WIN else ClickResult.EMPTY
+        if !grid.filter(gc => gc.mine && gc.selected).isEmpty then ClickResult.LOSE
+        else if grid.filter(gc => !gc.mine && !gc.selected).isEmpty then ClickResult.WIN
+        else ClickResult.EMPTY
       case _ => ClickResult.EMPTY
 
   def toggleFlag(p: Position): Unit = grid = grid.map(gc => if gc.p == p then gc.toggleFlag() else gc)
