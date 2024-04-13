@@ -6,7 +6,6 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import polyglot.Pair;
@@ -95,7 +94,7 @@ public class GUI extends JFrame {
             // call the logic here
             // if this button is a cell with counter, put the number
             // if this button has a flag, put the flag
-            GameCellData gameCellData = this.logics.getCellStatus(entry.getValue()).get();
+            GameCell gameCellData = this.logics.getCellStatus(entry.getValue()).get();
             if(gameCellData.selected() && !gameCellData.mine()){
                 entry.getKey().setText(String.valueOf(gameCellData.minesAround()));
                 entry.getKey().setEnabled(false);

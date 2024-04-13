@@ -8,6 +8,6 @@ public interface Logics {
 
     void toggleFlag(Pair<Integer, Integer> cellPosition);
 
-    Optional<GameCellData> getCellStatus(Pair<Integer, Integer> cellPosition);
+    Optional<GameCell> getCellStatus(Pair<Integer, Integer> cellPosition);
 
 }
