@@ -7,7 +7,7 @@ import scala.util.Random
 
 object Sequences: // Essentially, generic linkedlists
   
-  enum Sequence[+E]:
+  enum Sequence[E]:
     case Cons(head: E, tail: Sequence[E])
     case Nil()
 
@@ -22,8 +22,6 @@ object Sequences: // Essentially, generic linkedlists
         sequence = Cons(e, sequence)
       sequence.reverse()
 
-
-
     def apply(range: Range): Sequence[Int] =
       var sequence: Sequence[Int] = Nil()
       for e <- range do
@@ -31,8 +29,6 @@ object Sequences: // Essentially, generic linkedlists
       sequence.reverse()
 
     def empty[A]: Sequence[A] = Nil()
-
-
 
     extension [A](sequence: Sequence[A])
       def apply(index: Int): A =
@@ -52,15 +48,15 @@ object Sequences: // Essentially, generic linkedlists
           case _ => i
         _count(sequence, 0)
 
-      def intersect(sequence2: Sequence[A]): Sequence[A]=
-        sequence.filter(i => sequence2.contains(i))
+      def intersect(s2: Sequence[A]): Sequence[A]=
+        sequence.filter(i => s2.contains(i))
 
       def head: Optional[A] = sequence match
         case Cons(h, _) => Just(h)
         case _ => Empty()
 
       def foreach(action : A => Unit): Unit = sequence match
-        case Cons(h,t) => {action(h); t.foreach(action)}
+        case Cons(h,t) => action(h); t.foreach(action)
         case _ => ()
 
       def concat(other: Sequence[A]): Sequence[A] = sequence match
@@ -87,56 +83,39 @@ object Sequences: // Essentially, generic linkedlists
       def reverse(): Sequence[A] = sequence match
         case Cons(h, t) => t.reverse().concat(Cons(h, Nil()))
         case _ => Nil()
+
       def remove(item: A): Sequence[A] = sequence match
         case Sequence.Cons(h, tail) => if h == item then tail else Cons(h, tail.remove(item))
         case _ => Nil()
+
       def shuffle(): Sequence[A] =
         var ns: Sequence[A] = Nil()
         var os: Sequence[A] = sequence
         val r: Random = Random()
         for n <- 0 until sequence.length
           do
-            val i = r.nextInt(os.length)
-            ns = ns.concat(Sequence(os(i)))
-            os = os.remove(os(i))
+            val o = os(r.nextInt(os.length))
+            ns = ns.concat(Sequence(o))
+            os = os.remove(o)
         ns
+
       def splitAt(index: Int): (Sequence[A], Sequence[A]) =
         var fs: Sequence[A] = Nil()
         var ls: Sequence[A] = Nil()
         for i <- 0 until index do fs = fs.concat(Sequence(sequence(i)))
         for i <- index until sequence.length do ls = ls.concat(Sequence(sequence(i)))
         (fs,ls)
-      def combine(s: Sequence[A]): Sequence[(A,A)] =
+
+      def combine(s2: Sequence[A]): Sequence[(A,A)] =
         for
           x <- sequence
-          y <- s
+          y <- s2
         yield (x,y)
+
       @annotation.tailrec
       def foldLeft(a: Sequence[String])(f: (Sequence[String], A) => Sequence[String]): Sequence[String] = sequence match
         case Cons(h, t) => t.foldLeft(f(a, h))(f)
         case Nil() => a
-      def zip[B](s: Sequence[B]): Sequence[(A, B)] =
-        (sequence, s) match
-        case (Cons(h1, t1), Cons(h2, t2)) => Cons((h1, h2), t1.zip(t2))
-        case _ => Nil()
-
-
-
-//            val buf = new ArrayBuffer[T] ++= xs
-//
-//            def swap(i1: Int, i2: Int): Unit = {
-//              val tmp = buf(i1)
-//              buf(i1) = buf(i2)
-//              buf(i2) = tmp
-//            }
-//
-//            for (n <- buf.length to 2 by -1) {
-//              val k = nextInt(n)
-//              swap(n - 1, k)
-//            }
-//
-//            (bf.newBuilder(xs) ++= buf).result()
-//          }
 
 @main def trySequences =
   import Sequences.* 

@@ -11,7 +11,7 @@ case class GameCell(position: Pair[Integer, Integer], selected: Boolean = false,
   def toggleFlag(): GameCell = this.copy(flagged = !flagged)
   def updateMinesAround(m: Int): GameCell = this.copy(minesAround = m)
 
-class LogicsImpl(private val size: Int, private val mineToPlace: Int) extends Logics:
+class LogicsImpl(size: Int, mineToPlace: Int) extends Logics:
   private var grid: Sequence[GameCell] = makeGrid(size, mineToPlace)
 
   private def neighbours(gc1: GameCell): Sequence[GameCell] =
@@ -27,7 +27,7 @@ class LogicsImpl(private val size: Int, private val mineToPlace: Int) extends Lo
   def clickCell(cellPosition: Pair[Integer, Integer]): ClickResult =
     grid.find(gc => !gc.flagged && gc.position == cellPosition && !gc.selected) match
       case myOptional.Just(gc) =>
-        grid = grid.map(gc => if !gc.flagged && gc.position == cellPosition then gc.select() else gc)
+        grid = grid.map(gc => if gc.position == cellPosition then gc.select() else gc)
         if !gc.mine && gc.minesAround == 0 then neighbours(gc).foreach(gc => clickCell(gc.position))
         if !grid.filter(gc => gc.mine && gc.selected).isEmpty then ClickResult.LOSE else if grid.filter(gc => !gc.mine && !gc.selected).isEmpty then ClickResult.WIN else ClickResult.EMPTY
       case _ => ClickResult.EMPTY

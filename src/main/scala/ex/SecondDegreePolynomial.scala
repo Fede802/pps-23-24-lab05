@@ -22,7 +22,7 @@ object SecondDegreePolynomial:
     def -(polynomial: SecondDegreePolynomial): SecondDegreePolynomial =
       SecondDegreePolynomial(secondDegree-polynomial.secondDegree, firstDegree-polynomial.firstDegree, constant-polynomial.constant)
 
-    override def toString: String = s"[SecondDegreePolynomialImpl = ${secondDegree} * X^2 + ${firstDegree} * X + ${constant}]"
+    override def toString: String = s"${secondDegree} * X^2 + ${firstDegree} * X + ${constant}"
 
 @main def checkComplex(): Unit =
   val simplePolynomial = SecondDegreePolynomial(1.0, 0, 3)
