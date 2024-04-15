@@ -1,10 +1,9 @@
 package polyglot.minesweeper
 
-import polyglot.{OptionToOptional, Pair}
+import polyglot.OptionToOptional
 import util.Optionals.Optional as myOptional
 import util.Sequences.Sequence
 import java.util.Optional
-import scala.util.Random
 
 case class GameCell(p: Position, selected: Boolean = false, flagged: Boolean = false, mine: Boolean = false, minesAround: Int = -1):
   def select(): GameCell = this.copy(selected = true)

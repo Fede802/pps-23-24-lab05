@@ -32,6 +32,7 @@ object Sequences: // Essentially, generic linkedlists
 
     extension [A](sequence: Sequence[A])
       def apply(index: Int): A =
+        @tailrec
         def _get(s: Sequence[A], i: Int, index: Int): A = s match
           case Cons(h, t) => if i != index then _get(t, i + 1, index) else h
 
@@ -113,7 +114,7 @@ object Sequences: // Essentially, generic linkedlists
         yield (x,y)
 
       @annotation.tailrec
-      def foldLeft(a: Sequence[String])(f: (Sequence[String], A) => Sequence[String]): Sequence[String] = sequence match
+      def foldLeft[B](a: B)(f: (B, A) => B): B = sequence match
         case Cons(h, t) => t.foldLeft(f(a, h))(f)
         case Nil() => a
 

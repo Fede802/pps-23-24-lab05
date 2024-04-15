@@ -3,6 +3,7 @@ import util.Sequences.Sequence
 
 object SameTag:
   def unapply(s: Sequence[Item]): Option[Sequence[String]] =
+    s
     s.map(_.tags).foldLeft(s.head.orElse(Item.empty).tags)(
       (acc, seq) => acc.intersect(seq)) match
       case Sequence.Nil() => None
